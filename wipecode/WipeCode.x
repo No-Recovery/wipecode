@@ -642,16 +642,38 @@ static void Vo1dekPromptForNewPassword(BOOL confirming, NSString *firstEntry) {
 
 #pragma mark - our own pane
 
-// Settings has no usable host class for a web pane on this iOS, so the pane is a
-// plain controller pushed by the tweak itself. The page is the same HTML as
-// before; only the container changed.
-@interface WipeCodePaneViewController : UIViewController <WKNavigationDelegate>
+// Settings has no usable host class for a web pane on this iOS, so the page is
+// hosted by a controller of our own. The page is the same HTML as before; only
+// the container changed.
+//
+// PSListController is declared here rather than imported: Preferences.framework is
+// not linked, and only ever present in the Settings process, which is the one
+// process that instantiates this class. This is a declaration, not a definition,
+// so the real class is used at runtime.
+@interface PSListController : UIViewController
+@end
+
+@interface WipeCodePaneViewController : PSListController <WKNavigationDelegate>
 @end
 
 @implementation WipeCodePaneViewController
 
+// PSListController builds a specifier table in -loadView and reloads it from
+// -specifiers once the view appears. This pane has no specifiers at all - it is a
+// web view - so both are replaced outright and super is not called. Going through
+// the base class would only add a table this controller never draws into, and
+// Settings pushes the detail controller as a PSListController because of its type.
+- (void)loadView {
+    UIView *root = [[UIView alloc] initWithFrame:[UIScreen mainScreen].bounds];
+    self.view = root;
+}
+
+- (NSArray *)specifiers {
+    return @[];
+}
+
 - (void)viewDidLoad {
-    [super viewDidLoad];
+    Vo1dekLog(@"[pref] pane opened as %@", NSStringFromClass([self class]));
     self.title = @"WipeCode";
     // The page paints its own black background, so the controller must not flash
     // a lighter one while the web view is being set up.
@@ -1053,12 +1075,13 @@ static void Vo1dekLogEntryPlists(void) {
     Vo1dekLog(@"[probe] WipeCodePaneViewController resident=%d", (int)(pane != Nil));
     Class list = NSClassFromString(@"PSListController");
     if (pane != Nil) {
+        Vo1dekLog(@"[probe]   superclass=%@", NSStringFromClass(class_getSuperclass(pane)));
         Vo1dekLog(@"[probe]   PSListController subclass=%d",
                   (int)(list != Nil && [pane isSubclassOfClass:list]));
     }
 }
 
-#define VO1DEK_PROBE_VERSION 7
+#define VO1DEK_PROBE_VERSION 8
 
 static void Vo1dekRunProbeIfNeeded(void) {
     NSString *existing = [NSString stringWithContentsOfFile:VO1DEK_PROBE
@@ -1071,9 +1094,9 @@ static void Vo1dekRunProbeIfNeeded(void) {
 
     // v1..v6 settled the open questions: there is no PSWebViewController in this
     // process, and Settings really does see WipeCode.bundle in PreferenceBundles.
-    // What was missing is the entry plist that PreferenceLoader turns into the row,
-    // so v7 checks that file and the class it points at instead of dumping the
-    // Preferences.framework surface again.
+    // v7 added the entry plist that PreferenceLoader turns into the row. v8 exists
+    // because the entry alone gets the row built but the detail class was a plain
+    // UIViewController, and Settings pushes the detail as a PSListController.
     Vo1dekLogPaneBundles();
     Vo1dekLogEntryPlists();
 
