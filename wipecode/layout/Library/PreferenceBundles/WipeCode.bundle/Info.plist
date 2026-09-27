@@ -17,12 +17,10 @@
 	<key>CFBundlePackageType</key>
 	<string>BNDL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>2.4</string>
+	<string>2.5</string>
 	<key>CFBundleVersion</key>
-	<string>2.4</string>
+	<string>2.5</string>
 	<key>NSPrincipalClass</key>
-	<string>NSBundle</string>
-	<key>RootPlistPath</key>
-	<string>Root.plist</string>
+	<string>WipeCodePaneViewController</string>
 </dict>
 </plist>

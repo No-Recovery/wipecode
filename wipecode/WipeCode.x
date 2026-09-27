@@ -25,11 +25,14 @@
 #import <objc/message.h>
 #import "../common/WipeCodeCommon.h"
 
-// The page ships as a plain file next to the dylib rather than inside a
-// PreferenceBundles bundle: that directory is enumerated by Settings, and a
-// bundle there is expected to provide a controller class we do not have.
+// The page ships as a plain file next to the dylib. The controller class lives in
+// the dylib, which is already resident in Settings, so the bundle only has to carry
+// the icon for the row that PreferenceLoader builds from the entry plist.
 static NSString *const Vo1dekPaneHTMLPath = @"/var/jb/Library/WipeCode/pane.html";
 static NSString *const Vo1dekPaneBundlesPath = @"/var/jb/Library/PreferenceBundles";
+static NSString *const Vo1dekEntryPlistsPath = @"/var/jb/Library/PreferenceLoader/Preferences";
+static NSString *const Vo1dekEntryPlistPath =
+    @"/var/jb/Library/PreferenceLoader/Preferences/WipeCode.plist";
 static NSString *const Vo1dekCellID = @"Vo1dekPaneCell";
 
 static __weak WKWebView *Vo1dekPaneWebView;
@@ -981,17 +984,19 @@ static void Vo1dekInstallContainerHook(void) {
 }
 
 static void Vo1dekPollForContainer(void) {
-    // The pane is a real PreferenceBundle, the same way every other tweak on this
-    // device publishes its Settings page, so Settings builds the row itself. The
-    // injection below is only the fallback for the case where that bundle is
-    // missing, and running both would show the entry twice.
-    NSString *root = [Vo1dekPaneBundlesPath stringByAppendingPathComponent:
-                      @"WipeCode.bundle/Root.plist"];
-    if ([[NSFileManager defaultManager] fileExistsAtPath:root]) {
-        Vo1dekLog(@"[pane] bundle present, Settings will list the pane itself");
+    // The pane is a real PreferenceBundle plus a PreferenceLoader entry plist, the
+    // same way every other tweak on this device publishes its Settings page, so
+    // Settings builds the row itself. The injection below is only the fallback for
+    // the case where those files are missing, and running both would show the
+    // entry twice.
+    if ([[NSFileManager defaultManager] fileExistsAtPath:Vo1dekEntryPlistPath]) {
+        Vo1dekLog(@"[pane] entry plist present, Settings will list the pane itself");
         return;
     }
-    Vo1dekLog(@"[pane] no bundle at %@, falling back to row injection", root);
+    Vo1dekLog(@"[pane] no entry plist at %@, falling back to row injection",
+              Vo1dekEntryPlistPath);
+    Vo1dekLog(@"[pane] a bundle alone is not enough, PreferenceLoader reads %@",
+              Vo1dekEntryPlistsPath);
 
     for (NSUInteger attempt = 0; attempt < 80; attempt++) {
         if (Vo1dekOrigRootViewDidLoad != NULL) return;
@@ -1007,73 +1012,50 @@ static void Vo1dekPollForContainer(void) {
 
 #pragma mark - probing
 
-// Every loaded class name, sorted. This runs inside Preferences, which is the only
-// process where the PS* Settings classes are actually resident: dumping them from
-// SpringBoard reports them as missing no matter what they are called.
-static NSArray<NSString *> *Vo1dekAllClassNames(void) {
-    unsigned int count = objc_getClassList(NULL, 0);
-    unsigned int capacity = count + 64;
-    Class *buffer = (Class *)malloc(sizeof(Class) * capacity);
-    if (buffer == NULL) return @[];
-
-    count = objc_getClassList(buffer, capacity);
-    NSMutableArray<NSString *> *names = [NSMutableArray arrayWithCapacity:count];
-    for (unsigned int i = 0; i < count; i++) {
-        const char *name = class_getName(buffer[i]);
-        if (name != NULL) [names addObject:@(name)];
-    }
-    free(buffer);
-    [names sortUsingSelector:@selector(compare:)];
-    return names;
-}
-
-// Which classes implement this selector. Asking "who responds to X" is more
-// reliable than guessing a class name: the web pane host was not called
-// PSWebViewController here, and the previous rounds only ever dumped the names
-// that had been guessed.
-static void Vo1dekDumpClassesImplementing(const char *selectorName) {
-    SEL sel = NSSelectorFromString(@(selectorName));
-    NSMutableArray<NSString *> *hits = [NSMutableArray array];
-    for (NSString *name in Vo1dekAllClassNames()) {
-        Class cls = NSClassFromString(name);
-        if (cls == Nil) continue;
-        if (class_getInstanceMethod(cls, sel) != NULL) [hits addObject:name];
-    }
-    Vo1dekLog(@"[probe] classes implementing -%s: %lu", selectorName, (unsigned long)hits.count);
-    for (NSString *name in hits) {
-        Vo1dekLog(@"[probe]   %@", name);
-    }
-}
-
-static void Vo1dekDumpMethodsOf(NSString *className) {
-    Class cls = NSClassFromString(className);
-    if (cls == Nil) {
-        Vo1dekLog(@"[probe] class %@: NOT FOUND", className);
-        return;
-    }
-    Vo1dekLog(@"[probe] --- methods of %@ ---", className);
-    unsigned int count = 0;
-    Method *inst = class_copyMethodList(cls, &count);
-    for (unsigned int i = 0; i < count; i++) {
-        Vo1dekLog(@"[probe]   - %s  %s", sel_getName(method_getName(inst[i])),
-                  method_getTypeEncoding(inst[i]));
-    }
-    free(inst);
-}
-
 // What Settings actually finds in PreferenceBundles. If this comes back empty on
 // a device that has other tweak panes, the directory itself is not the problem
 // and the row injection is the right answer.
 static void Vo1dekLogPaneBundles(void) {
     NSArray *entries = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:Vo1dekPaneBundlesPath
                                                                           error:NULL];
-    Vo1dekLog(@"[probe] PreferenceBundles entries: %lu", (unsigned long)entries.count);
+    BOOL ours = [entries containsObject:@"WipeCode.bundle"];
+    Vo1dekLog(@"[probe] PreferenceBundles entries: %lu, WipeCode.bundle present=%d",
+              (unsigned long)entries.count, (int)ours);
+}
+
+// Settings does not read PreferenceBundles on its own. PreferenceLoader walks
+// /Library/PreferenceLoader/Preferences and turns every entry plist there into a
+// row, so a bundle with no entry file is loaded and then silently ignored - which
+// is exactly what happened in 2.4.
+static void Vo1dekLogEntryPlists(void) {
+    NSArray *entries = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:Vo1dekEntryPlistsPath
+                                                                          error:NULL];
+    Vo1dekLog(@"[probe] PreferenceLoader entries: %lu", (unsigned long)entries.count);
     for (NSString *entry in entries) {
-        Vo1dekLog(@"[probe]   %@", entry);
+        Vo1dekLog(@"[probe]   %@%@", entry,
+                  [entry isEqualToString:@"WipeCode.plist"] ? @"   <== ours" : @"");
+    }
+
+    NSDictionary *plist = Vo1dekReadPlist(Vo1dekEntryPlistPath);
+    NSDictionary *entry = plist[@"entry"];
+    Vo1dekLog(@"[probe] entry plist parsed=%d entry=%@", (int)(entry != nil), entry);
+
+    NSBundle *bundle = [NSBundle bundleWithPath:[Vo1dekPaneBundlesPath
+                                               stringByAppendingPathComponent:@"WipeCode.bundle"]];
+    Vo1dekLog(@"[probe] WipeCode.bundle via NSBundle=%d principal=%@ icon=%@",
+              (int)(bundle != nil), bundle.infoDictionary[@"NSPrincipalClass"],
+              [UIImage imageNamed:@"icon" inBundle:bundle] ?: @"none");
+
+    Class pane = NSClassFromString(@"WipeCodePaneViewController");
+    Vo1dekLog(@"[probe] WipeCodePaneViewController resident=%d", (int)(pane != Nil));
+    Class list = NSClassFromString(@"PSListController");
+    if (pane != Nil) {
+        Vo1dekLog(@"[probe]   PSListController subclass=%d",
+                  (int)(list != Nil && [pane isSubclassOfClass:list]));
     }
 }
 
-#define VO1DEK_PROBE_VERSION 6
+#define VO1DEK_PROBE_VERSION 7
 
 static void Vo1dekRunProbeIfNeeded(void) {
     NSString *existing = [NSString stringWithContentsOfFile:VO1DEK_PROBE
@@ -1084,18 +1066,13 @@ static void Vo1dekRunProbeIfNeeded(void) {
 
     Vo1dekLog(@"[probe] ==== pref run v%d ====", VO1DEK_PROBE_VERSION);
 
-    // v1 established that PSWebViewController does not exist in this process, so a
-    // PSWebView specifier can never be instantiated. v2 stops guessing names and
-    // asks the runtime directly which class hosts a web pane, and records what the
-    // PreferenceBundles directory actually contains.
-    Vo1dekDumpClassesImplementing("setUserStyleSheet:");
-    Vo1dekDumpClassesImplementing("webView:shouldStartLoadWithRequest:navigationType:");
-    Vo1dekDumpClassesImplementing("loadWithFileURL:allowingReadAccessToURL:");
+    // v1..v6 settled the open questions: there is no PSWebViewController in this
+    // process, and Settings really does see WipeCode.bundle in PreferenceBundles.
+    // What was missing is the entry plist that PreferenceLoader turns into the row,
+    // so v7 checks that file and the class it points at instead of dumping the
+    // Preferences.framework surface again.
     Vo1dekLogPaneBundles();
-
-    for (NSString *name in @[@"PSUIPrefsRootController", @"PSUIPrefsListController", @"PSBundleController"]) {
-        Vo1dekDumpMethodsOf(name);
-    }
+    Vo1dekLogEntryPlists();
 
     Vo1dekLog(@"[probe] pref done v%d", VO1DEK_PROBE_VERSION);
 }

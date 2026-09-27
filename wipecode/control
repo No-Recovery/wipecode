@@ -1,9 +1,9 @@
 Package: com.vo1dek.wipecode
 Name: WipeCode
-Version: 2.4
+Version: 2.5
 Architecture: iphoneos-arm64
 Description: Adds a WipeCode pane to Settings, where a second wipe password is set, and performs an authenticated "Erase All Content and Settings" through SpringBoard. The Settings pane and the SpringBoard half are one dylib injected into both processes.
-Depends: mobilesubstrate
+Depends: mobilesubstrate, preferenceloader
 Conflicts: com.vo1dek.wipecode-sb, com.vo1dek.wipecode-pref
 Replaces: com.vo1dek.wipecode-sb, com.vo1dek.wipecode-pref
 Maintainer: dassd <dassd@localhost>
