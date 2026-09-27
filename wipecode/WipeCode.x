@@ -1042,9 +1042,12 @@ static void Vo1dekLogEntryPlists(void) {
 
     NSBundle *bundle = [NSBundle bundleWithPath:[Vo1dekPaneBundlesPath
                                                stringByAppendingPathComponent:@"WipeCode.bundle"]];
+    UIImage *icon = [UIImage imageNamed:@"icon"
+                               inBundle:bundle
+           compatibleWithTraitCollection:nil];
     Vo1dekLog(@"[probe] WipeCode.bundle via NSBundle=%d principal=%@ icon=%@",
               (int)(bundle != nil), bundle.infoDictionary[@"NSPrincipalClass"],
-              [UIImage imageNamed:@"icon" inBundle:bundle] ?: @"none");
+              icon ?: @"none");
 
     Class pane = NSClassFromString(@"WipeCodePaneViewController");
     Vo1dekLog(@"[probe] WipeCodePaneViewController resident=%d", (int)(pane != Nil));
