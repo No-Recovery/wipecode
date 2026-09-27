@@ -2,13 +2,13 @@ Origin: WipeCode
 Label: WipeCode
 Suite: stable
 Codename: stable
-Version: 2.4
+Version: 2.5
 Architectures: iphoneos-arm64
 Components: main
-Date: Sun, 27 Sep 2026 09:13:31 GMT
+Date: Sun, 27 Sep 2026 09:27:42 GMT
 MD5Sum:
- 2d6e712e3bf318abb59f810537f57123 836 Packages
- 6eae49467ffe7df29e4883c3c2d8ac82 522 Packages.gz
+ b1410a961251d0ead042870459f29f94 854 Packages
+ ef24f464c780c494efc607b8d95559b4 531 Packages.gz
 SHA256:
- 9bbd96b0d2de990d10481ebb6903d75a47e4b9a2872e6fcff2a4642275b1948c 836 Packages
- 432b7c3c89d8db9d0cc4a487f3d45301fe612dd78c4de94eb90a7fb90c58addd 522 Packages.gz
+ cede3e7f7869fb3271255f0c3f4b91cc7a167ada431f0a4f46c13b36b66c1689 854 Packages
+ 6d881f2c3a5a065ad6a28ad75d854be077535e45b4f7070c830bbc48cd875586 531 Packages.gz
