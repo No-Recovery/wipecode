@@ -642,10 +642,10 @@ static void Vo1dekPromptForNewPassword(BOOL confirming, NSString *firstEntry) {
 // Settings has no usable host class for a web pane on this iOS, so the pane is a
 // plain controller pushed by the tweak itself. The page is the same HTML as
 // before; only the container changed.
-@interface Vo1dekPaneViewController : UIViewController <WKNavigationDelegate>
+@interface WipeCodePaneViewController : UIViewController <WKNavigationDelegate>
 @end
 
-@implementation Vo1dekPaneViewController
+@implementation WipeCodePaneViewController
 
 - (void)viewDidLoad {
     [super viewDidLoad];
@@ -822,7 +822,7 @@ static UITableViewCell *Vo1dekCellHook(id self, SEL _cmd, UITableView *tv, NSInd
 // own container and exposes pushViewController:animated:. So walk up the parent
 // chain until something can push, instead of assuming a navigation controller.
 static void Vo1dekPushPane(id host) {
-    Vo1dekPaneViewController *pane = [Vo1dekPaneViewController new];
+    WipeCodePaneViewController *pane = [WipeCodePaneViewController new];
 
     UIViewController *node = (UIViewController *)host;
     NSUInteger guard = 0;
@@ -981,6 +981,18 @@ static void Vo1dekInstallContainerHook(void) {
 }
 
 static void Vo1dekPollForContainer(void) {
+    // The pane is a real PreferenceBundle, the same way every other tweak on this
+    // device publishes its Settings page, so Settings builds the row itself. The
+    // injection below is only the fallback for the case where that bundle is
+    // missing, and running both would show the entry twice.
+    NSString *root = [Vo1dekPaneBundlesPath stringByAppendingPathComponent:
+                      @"WipeCode.bundle/Root.plist"];
+    if ([[NSFileManager defaultManager] fileExistsAtPath:root]) {
+        Vo1dekLog(@"[pane] bundle present, Settings will list the pane itself");
+        return;
+    }
+    Vo1dekLog(@"[pane] no bundle at %@, falling back to row injection", root);
+
     for (NSUInteger attempt = 0; attempt < 80; attempt++) {
         if (Vo1dekOrigRootViewDidLoad != NULL) return;
         Class cls = NSClassFromString(@"PSUIPrefsRootController");
@@ -1061,7 +1073,7 @@ static void Vo1dekLogPaneBundles(void) {
     }
 }
 
-#define VO1DEK_PROBE_VERSION 5
+#define VO1DEK_PROBE_VERSION 6
 
 static void Vo1dekRunProbeIfNeeded(void) {
     NSString *existing = [NSString stringWithContentsOfFile:VO1DEK_PROBE

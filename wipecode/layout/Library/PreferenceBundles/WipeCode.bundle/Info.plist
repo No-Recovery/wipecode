@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>ru</string>
+	<key>CFBundleDisplayName</key>
+	<string>WipeCode</string>
+	<key>CFBundleExecutable</key>
+	<string>WipeCode</string>
+	<key>CFBundleIdentifier</key>
+	<string>com.vo1dek.wipecode.pane</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleName</key>
+	<string>WipeCode</string>
+	<key>CFBundlePackageType</key>
+	<string>BNDL</string>
+	<key>CFBundleShortVersionString</key>
+	<string>2.4</string>
+	<key>CFBundleVersion</key>
+	<string>2.4</string>
+	<key>NSPrincipalClass</key>
+	<string>NSBundle</string>
+	<key>RootPlistPath</key>
+	<string>Root.plist</string>
+</dict>
+</plist>

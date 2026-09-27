@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>icon</key>
+	<string>icon</string>
+	<key>items</key>
+	<array>
+		<dict>
+			<key>cell</key>
+			<string>PSGroupSpecifier</string>
+			<key>footerText</key>
+			<string>Панель WipeCode. Пароль стирания хранится локально и используется для подтверждения сброса.</string>
+			<key>label</key>
+			<string>WipeCode</string>
+		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSLinkCell</string>
+			<key>detail</key>
+			<string>WipeCodePaneViewController</string>
+			<key>icon</key>
+			<string>icon</string>
+			<key>isController</key>
+			<true/>
+			<key>title</key>
+			<string>WipeCode</string>
+		</dict>
+	</array>
+	<key>title</key>
+	<string>WipeCode</string>
+</dict>
+</plist>
