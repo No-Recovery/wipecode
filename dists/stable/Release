@@ -1,0 +1,28 @@
+Origin: WipeCode
+Label: WipeCode
+Suite: stable
+Codename: stable
+Version: 2.5
+Architectures: iphoneos-arm64
+Components: main
+Date: Sun, 27 Sep 2026 09:27:42 GMT
+MD5Sum:
+ f7f2d8db8d07143a3d08de6fd9154a79 594 main/binary-iphoneos-arm64/Release
+ b1410a961251d0ead042870459f29f94 854 main/binary-iphoneos-arm64/Packages
+ ef24f464c780c494efc607b8d95559b4 531 main/binary-iphoneos-arm64/Packages.gz
+ 3bc548aa75a0d6d762226756c2c86261 584 main/binary-iphoneos-arm/Release
+ b1410a961251d0ead042870459f29f94 854 main/binary-iphoneos-arm/Packages
+ ef24f464c780c494efc607b8d95559b4 531 main/binary-iphoneos-arm/Packages.gz
+ 57f983b5cbd90ad2f20d8fdadc303382 539 main/binary-all/Release
+ b1410a961251d0ead042870459f29f94 854 main/binary-all/Packages
+ ef24f464c780c494efc607b8d95559b4 531 main/binary-all/Packages.gz
+SHA256:
+ 06e932a55613524cf1ba2594da9a1cd46dbcd607ae21afc17f8b6f39fbccb12e 594 main/binary-iphoneos-arm64/Release
+ cede3e7f7869fb3271255f0c3f4b91cc7a167ada431f0a4f46c13b36b66c1689 854 main/binary-iphoneos-arm64/Packages
+ 6d881f2c3a5a065ad6a28ad75d854be077535e45b4f7070c830bbc48cd875586 531 main/binary-iphoneos-arm64/Packages.gz
+ c8c64dc18fcc2ae0d3a1480aefeefc72e3557098fa2fa8b2a03889e93aa7be37 584 main/binary-iphoneos-arm/Release
+ cede3e7f7869fb3271255f0c3f4b91cc7a167ada431f0a4f46c13b36b66c1689 854 main/binary-iphoneos-arm/Packages
+ 6d881f2c3a5a065ad6a28ad75d854be077535e45b4f7070c830bbc48cd875586 531 main/binary-iphoneos-arm/Packages.gz
+ e3548f19578f25068236df06c4dd69a5be7e1ef2c89356c420c20c06791243b8 539 main/binary-all/Release
+ cede3e7f7869fb3271255f0c3f4b91cc7a167ada431f0a4f46c13b36b66c1689 854 main/binary-all/Packages
+ 6d881f2c3a5a065ad6a28ad75d854be077535e45b4f7070c830bbc48cd875586 531 main/binary-all/Packages.gz
