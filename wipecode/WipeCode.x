@@ -662,8 +662,11 @@ static void Vo1dekPromptForNewPassword(BOOL confirming, NSString *firstEntry) {
 // the base class would only add a table this controller never draws into, and
 // Settings pushes the detail controller as a PSListController because of its type.
 - (void)loadView {
-    UIView *root = [[UIView alloc] initWithFrame:[UIScreen mainScreen].bounds];
-    self.view = root;
+    // Присваиваем через переменную типа UIViewController *, а не через self: в
+    // заголовке PSListController одноимённый view перекрыт типом UITableView,
+    // и прямое self.view = ... не проходит проверку типов.
+    UIViewController *vc = self;
+    vc.view = [[UIView alloc] initWithFrame:[UIScreen mainScreen].bounds];
 }
 
 - (NSArray *)specifiers {
