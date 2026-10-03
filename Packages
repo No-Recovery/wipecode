@@ -1,6 +1,6 @@
 Package: com.vo1dek.wipecode
 Name: WipeCode
-Version: 2.5
+Version: 2.6
 Architecture: iphoneos-arm64
 Section: Tweaks
 Installed-Size: 364
@@ -10,9 +10,9 @@ Conflicts: com.vo1dek.wipecode-sb, com.vo1dek.wipecode-pref
 Replaces: com.vo1dek.wipecode-sb, com.vo1dek.wipecode-pref
 Description: Adds a WipeCode pane to Settings, where a second wipe password is set, and performs an authenticated "Erase All Content and Settings" through SpringBoard. The Settings pane and the SpringBoard half are one dylib injected into both processes.
 Author: dassd
-Filename: pool/main/w/wipecode/com.vo1dek.wipecode_2.5_iphoneos-arm64.deb
-MD5sum: 6928120e3cf671047ea5aafbd679578d
-SHA1: cb3665ffa5536c7b7bcb41aa877d26d86c4b4052
-SHA256: 0b4a8af91578386fd5022c9edbf56ff9704d7b0b996a978b65e404b9703cffe6
-Size: 54134
+Filename: pool/main/w/wipecode/com.vo1dek.wipecode_2.6_iphoneos-arm64.deb
+MD5sum: 4c5c19dbd0891fe825c80300de4b69a0
+SHA1: ddce5e739f25d703d72d4ea8f424ce4d17c7b372
+SHA256: 88e5b7fab5dce60d1bf727b2396e2303f793a095f791712f86fe8e651f752681
+Size: 54918
 Tag: role::hacker
