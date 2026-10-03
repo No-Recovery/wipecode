@@ -21,6 +21,7 @@
 
 #import <UIKit/UIKit.h>
 #import <WebKit/WebKit.h>
+#import <Preferences/PSListController.h>
 #import <objc/runtime.h>
 #import <objc/message.h>
 #import "../common/WipeCodeCommon.h"
@@ -646,13 +647,10 @@ static void Vo1dekPromptForNewPassword(BOOL confirming, NSString *firstEntry) {
 // hosted by a controller of our own. The page is the same HTML as before; only
 // the container changed.
 //
-// PSListController is declared here rather than imported: Preferences.framework is
-// not linked, and only ever present in the Settings process, which is the one
-// process that instantiates this class. This is a declaration, not a definition,
-// so the real class is used at runtime.
-@interface PSListController : UIViewController
-@end
-
+// PSListController comes from Preferences.framework, which is linked for real:
+// Settings pushes the detail controller because of its type, and subclassing a
+// forward-declared class left _OBJC_CLASS_$_PSListController undefined at link
+// time.
 @interface WipeCodePaneViewController : PSListController <WKNavigationDelegate>
 @end
 
